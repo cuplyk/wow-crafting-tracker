@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react'
 import { calcItem, fmt, fmtPct } from './useStore.js'
 import { Trash2, Plus, ChevronDown, ChevronRight, Copy, Sword, FlaskConical } from 'lucide-react'
+import HoverTooltip from './ItemTooltip.jsx'
 
 function DecisionBadge({ decision }) {
   const map = {
@@ -68,7 +69,7 @@ function InlineEdit({ value, onChange, style = {}, type = 'text', placeholder = 
   )
 }
 
-function ReagentRow({ reagent, itemId, onUpdate, onDelete }) {
+function ReagentRow({ reagent, itemId, onUpdate, onDelete, allItems }) {
   const lineCost = reagent.qty * reagent.price
   return (
     <div style={{
@@ -78,12 +79,14 @@ function ReagentRow({ reagent, itemId, onUpdate, onDelete }) {
       padding: '0.4rem 1rem',
       borderBottom: '1px solid rgba(200,155,60,0.06)',
     }}>
-      <InlineEdit
-        value={reagent.name}
-        placeholder="Reagent name"
-        onChange={v => onUpdate(reagent.id, { name: v })}
-        style={{ fontSize: '0.9rem', color: 'var(--text)' }}
-      />
+      <HoverTooltip itemName={reagent.name} type="reagent" allItems={allItems}>
+        <InlineEdit
+          value={reagent.name}
+          placeholder="Reagent name"
+          onChange={v => onUpdate(reagent.id, { name: v })}
+          style={{ fontSize: '0.9rem', color: 'var(--text)' }}
+        />
+      </HoverTooltip>
       <InlineEdit
         value={reagent.qty}
         type="number"
@@ -116,7 +119,7 @@ function ReagentRow({ reagent, itemId, onUpdate, onDelete }) {
   )
 }
 
-function ItemCard({ item, onUpdate, onDelete, onDuplicate, onAddReagent, onUpdateReagent, onDeleteReagent }) {
+function ItemCard({ item, onUpdate, onDelete, onDuplicate, onAddReagent, onUpdateReagent, onDeleteReagent, allItems }) {
   const [open, setOpen] = useState(false)
   const { matCost, profit, margin, decision } = calcItem(item)
 
@@ -146,15 +149,17 @@ function ItemCard({ item, onUpdate, onDelete, onDuplicate, onAddReagent, onUpdat
 
         {/* Item name */}
         <div onClick={e => e.stopPropagation()}>
-          <InlineEdit
-            value={item.name}
-            placeholder="Item name"
-            onChange={v => onUpdate(item.id, { name: v })}
-            style={{
-              fontFamily: 'Cinzel, serif', fontSize: '0.9rem',
-              color: 'var(--gold-bright)', fontWeight: 600,
-            }}
-          />
+          <HoverTooltip itemName={item.name} type="item" allItems={allItems}>
+            <InlineEdit
+              value={item.name}
+              placeholder="Item name"
+              onChange={v => onUpdate(item.id, { name: v })}
+              style={{
+                fontFamily: 'Cinzel, serif', fontSize: '0.9rem',
+                color: 'var(--gold-bright)', fontWeight: 600,
+              }}
+            />
+          </HoverTooltip>
         </div>
 
         {/* Stats */}
@@ -253,6 +258,7 @@ function ItemCard({ item, onUpdate, onDelete, onDuplicate, onAddReagent, onUpdat
               itemId={item.id}
               onUpdate={onUpdateReagent}
               onDelete={onDeleteReagent}
+              allItems={allItems}
             />
           ))}
 
@@ -459,6 +465,7 @@ export default function ItemTracker({ store }) {
           onAddReagent={addReagent}
           onUpdateReagent={updateReagent}
           onDeleteReagent={deleteReagent}
+          allItems={items}
         />
       ))}
     </div>
