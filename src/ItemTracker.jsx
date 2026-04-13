@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react'
 import { calcItem, fmt, fmtPct } from './useStore.js'
-import { Trash2, Plus, ChevronDown, ChevronRight, Copy, Sword, FlaskConical } from 'lucide-react'
+import { Trash2, Plus, ChevronDown, ChevronRight, Copy, Sword, FlaskConical, Hammer, Lightbulb, Database } from 'lucide-react'
 import HoverTooltip from './ItemTooltip.jsx'
 
 function DecisionBadge({ decision }) {
@@ -46,7 +46,7 @@ function InlineEdit({ value, onChange, style = {}, type = 'text', placeholder = 
         style={{
           background: 'var(--bg4)', border: '1px solid var(--gold)',
           color: 'var(--gold-bright)', padding: '0.2rem 0.4rem',
-          borderRadius: 4, fontSize: 'inherit', fontFamily: 'Rajdhani, sans-serif',
+          borderRadius: 4, fontSize: 'inherit', fontFamily: 'Inter, sans-serif',
           fontWeight: 600, width: type === 'number' ? 80 : '100%',
           ...style
         }}
@@ -123,10 +123,17 @@ function ItemCard({ item, onUpdate, onDelete, onDuplicate, onAddReagent, onUpdat
   const [open, setOpen] = useState(false)
   const { matCost, profit, margin, decision } = calcItem(item)
 
+  const decisionColor = {
+    craft: 'var(--craft)',
+    marginal: 'var(--marginal)',
+    skip: 'var(--skip)',
+  }[decision]
+
   return (
     <div className="slide-in" style={{
       background: 'var(--bg2)',
       border: `1px solid ${open ? 'var(--border-bright)' : 'var(--border)'}`,
+      borderLeft: `3px solid ${decisionColor}`,
       borderRadius: 10, overflow: 'hidden',
       marginBottom: '0.6rem',
       transition: 'border-color 0.2s',
@@ -445,13 +452,125 @@ export default function ItemTracker({ store }) {
         </div>
       )}
 
-      {/* Items */}
-      {filtered.length === 0 && (
+      {/* Empty / onboarding state */}
+      {filtered.length === 0 && search && (
         <div style={{
           textAlign: 'center', padding: '3rem 1rem',
           color: 'var(--text-muted)', fontSize: '0.95rem',
         }}>
-          {search ? `No items match "${search}"` : 'No items yet. Click "New Item" to get started.'}
+          No items match "{search}"
+        </div>
+      )}
+
+      {items.length === 0 && !search && (
+        <div className="fade-up" style={{
+          background: 'var(--bg3)',
+          border: '1px solid var(--border)',
+          borderRadius: 12,
+          padding: '2.5rem 2rem',
+          textAlign: 'center',
+          maxWidth: 520,
+          margin: '1rem auto',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+        }}>
+          {/* Icon */}
+          <div style={{
+            width: 56, height: 56, borderRadius: '50%',
+            background: 'rgba(200,155,60,0.10)',
+            border: '1px solid rgba(200,155,60,0.25)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 1.25rem',
+          }}>
+            <Hammer size={26} style={{ color: 'var(--gold-bright)' }} />
+          </div>
+
+          {/* Title */}
+          <h2 style={{
+            fontFamily: 'Cinzel, serif', fontSize: '1.2rem',
+            fontWeight: 700, color: 'var(--gold-bright)',
+            marginBottom: '0.5rem',
+          }}>
+            Your crafting empire starts here
+          </h2>
+          <p style={{
+            fontSize: '0.88rem', color: 'var(--text-dim)',
+            lineHeight: 1.6, marginBottom: '1.75rem',
+            maxWidth: 380, margin: '0 auto 1.75rem',
+          }}>
+            Add crafted items, enter reagent costs, and instantly see what's worth crafting for profit.
+          </p>
+
+          {/* CTA buttons */}
+          <div style={{
+            display: 'flex', gap: '0.75rem',
+            justifyContent: 'center', flexWrap: 'wrap',
+            marginBottom: '1.5rem',
+          }}>
+            <button
+              onClick={() => setShowAdd(true)}
+              style={{
+                background: 'linear-gradient(135deg, var(--gold-dim), var(--gold))',
+                border: '1px solid var(--gold)',
+                color: '#0b0c12',
+                padding: '0.6rem 1.4rem', borderRadius: 8,
+                fontSize: '0.9rem', fontWeight: 700,
+                display: 'flex', alignItems: 'center', gap: 6,
+                transition: 'filter 0.15s',
+              }}
+              onMouseEnter={e => e.currentTarget.style.filter = 'brightness(1.15)'}
+              onMouseLeave={e => e.currentTarget.style.filter = 'none'}
+            >
+              <Plus size={15} /> Add your first item
+            </button>
+            <button
+              onClick={() => store.resetToDefault()}
+              style={{
+                background: 'rgba(74,158,255,0.08)',
+                border: '1px solid rgba(74,158,255,0.30)',
+                color: 'var(--blue)',
+                padding: '0.6rem 1.4rem', borderRadius: 8,
+                fontSize: '0.9rem', fontWeight: 600,
+                display: 'flex', alignItems: 'center', gap: 6,
+                transition: 'all 0.15s',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.borderColor = 'rgba(74,158,255,0.50)'
+                e.currentTarget.style.background = 'rgba(74,158,255,0.12)'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.borderColor = 'rgba(74,158,255,0.30)'
+                e.currentTarget.style.background = 'rgba(74,158,255,0.08)'
+              }}
+            >
+              <Database size={14} /> Load sample data
+            </button>
+          </div>
+
+          {/* Divider */}
+          <div style={{
+            height: 1, background: 'var(--border)',
+            margin: '0 auto 1.25rem', maxWidth: 200,
+          }} />
+
+          {/* Tips */}
+          <div style={{
+            display: 'flex', flexDirection: 'column', gap: '0.6rem',
+            textAlign: 'left', maxWidth: 340, margin: '0 auto',
+          }}>
+            {[
+              'Click any value to edit it inline',
+              'Expand items to manage reagents',
+              'Data saves automatically in your browser',
+            ].map((tip, i) => (
+              <div key={i} style={{
+                display: 'flex', alignItems: 'center', gap: '0.5rem',
+                fontSize: '0.78rem', color: 'var(--text-dim)',
+              }}>
+                <Lightbulb size={12} style={{ color: 'var(--gold)', flexShrink: 0 }} />
+                {tip}
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

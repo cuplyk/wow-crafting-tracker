@@ -2,15 +2,16 @@
   --gold: #C89B3C;
   --gold-bright: #FFD700;
   --gold-dim: #8B6914;
-  --bg: #080C14;
-  --bg2: #0E1520;
-  --bg3: #141F30;
-  --bg4: #1A2840;
-  --border: rgba(200,155,60,0.15);
-  --border-bright: rgba(200,155,60,0.4);
-  --text: #E8DFC8;
-  --text-dim: #7A7260;
-  --text-muted: #3A3830;
+  --gold-accent: #e6cc80;
+  --bg: #0b0c12;
+  --bg2: #0d0f18;
+  --bg3: #151725;
+  --bg4: #1a1d2d;
+  --border: rgba(255,255,255,0.10);
+  --border-bright: rgba(255,255,255,0.25);
+  --text: #EDE5D0;
+  --text-dim: #9CA3AF;
+  --text-muted: #6B7280;
   --craft: #3CB371;
   --craft-bg: rgba(60,179,113,0.1);
   --marginal: #E8A020;
@@ -24,7 +25,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'Rajdhani', sans-serif;
+  font-family: 'Inter', sans-serif;
   background: var(--bg);
   color: var(--text);
   min-height: 100vh;
@@ -33,14 +34,14 @@ body {
 
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg2); }
-::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--gold-dim); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.25); }
 
 input, textarea, select {
-  font-family: 'Rajdhani', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
-button { cursor: pointer; font-family: 'Rajdhani', sans-serif; }
+button { cursor: pointer; font-family: 'Inter', sans-serif; }
 
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(12px); }
@@ -57,6 +58,156 @@ button { cursor: pointer; font-family: 'Rajdhani', sans-serif; }
 
 .fade-up { animation: fadeUp 0.3s ease forwards; }
 .slide-in { animation: slideIn 0.25s ease forwards; }
+
+/* ── Responsive helpers ───────────────────────────────────── */
+
+.hide-mobile { display: none; }
+
+@media (min-width: 768px) {
+  .hide-mobile { display: block; }
+}
+
+@media (max-width: 600px) {
+  .tab-label { display: none; }
+}
+
+/* ── App shell layout ────────────────────────────────────── */
+
+.app-main {
+  flex: 1; position: relative; z-index: 1;
+  max-width: 1320px; margin: 0 auto; width: 100%;
+  padding: 1rem;
+}
+
+@media (min-width: 1280px) {
+  .app-main {
+    display: grid;
+    grid-template-columns: 1fr 260px;
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+}
+
+.app-content { min-width: 0; } /* prevent grid blowout */
+
+/* ── Sidebar ─────────────────────────────────────────────── */
+
+.sidebar {
+  display: none;
+}
+
+@media (min-width: 1280px) {
+  .sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    position: sticky;
+    top: 76px; /* header height + padding */
+    align-self: start;
+    max-height: calc(100vh - 92px);
+    overflow-y: auto;
+  }
+}
+
+.sidebar-card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+}
+
+.sidebar-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: 0.6rem;
+}
+
+/* ── Item card header — responsive grid ──────────────────── */
+
+.item-header-grid {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.8rem 1rem;
+  background: var(--bg3);
+  cursor: pointer;
+}
+
+@media (min-width: 768px) {
+  .item-header-grid {
+    grid-template-columns: auto 1fr auto auto auto auto;
+    gap: 0.75rem;
+  }
+}
+
+.item-stat-secondary {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .item-stat-secondary { display: inline; }
+}
+
+/* ── KPI grids ───────────────────────────────────────────── */
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .kpi-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* ── Footer — responsive stack ───────────────────────────── */
+
+.app-footer {
+  position: relative; z-index: 1;
+  border-top: 1px solid var(--border);
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  background: var(--bg2);
+}
+
+@media (max-width: 600px) {
+  .app-footer {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+  .app-footer > div {
+    justify-content: center;
+  }
+}
+
+/* ── Table responsive scroll hint ────────────────────────── */
+
+.table-wrap {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  -webkit-overflow-scrolling: touch;
+}
+
+.table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 580px; /* prevent column crush */
+}
 
 /* ── Hover tooltip ────────────────────────────────────────── */
 
