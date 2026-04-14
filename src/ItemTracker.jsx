@@ -83,20 +83,20 @@ function ReagentRow({ reagent, itemId, onUpdate, onDelete, allItems }) {
         <InlineEdit
           value={reagent.name}
           placeholder="Reagent name"
-          onChange={v => onUpdate(reagent.id, { name: v })}
+          onChange={v => onUpdate(itemId, reagent.id, { name: v })}
           style={{ fontSize: '0.9rem', color: 'var(--text)' }}
         />
       </HoverTooltip>
       <InlineEdit
         value={reagent.qty}
         type="number"
-        onChange={v => onUpdate(reagent.id, { qty: parseFloat(v) || 0 })}
+        onChange={v => onUpdate(itemId, reagent.id, { qty: parseFloat(v) || 0 })}
         style={{ fontSize: '0.9rem', color: 'var(--marginal)', textAlign: 'right' }}
       />
       <InlineEdit
         value={reagent.price}
         type="number"
-        onChange={v => onUpdate(reagent.id, { price: parseFloat(v) || 0 })}
+        onChange={v => onUpdate(itemId, reagent.id, { price: parseFloat(v) || 0 })}
         style={{ fontSize: '0.9rem', color: 'var(--blue)', textAlign: 'right' }}
       />
       <span style={{ fontSize: '0.9rem', color: 'var(--craft)', textAlign: 'right', fontWeight: 600 }}>
