@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import * as api from './api.js'
 
 const STORAGE_KEY = 'wow-crafting-items'
 
@@ -76,55 +77,101 @@ function uid() {
 }
 
 export function useStore() {
-  const [items, setItems] = useState(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY)
-      if (stored) return JSON.parse(stored)
-    } catch {}
-    return DEFAULT_ITEMS
-  })
+  const [items, setItems] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
+  // Load items from database on mount; seed defaults if empty
   useEffect(() => {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)) } catch {}
+    let cancelled = false
+    async function load() {
+      try {
+        const data = await api.fetchItems()
+        if (cancelled) return
+        if (data.length === 0) {
+          // Seed database with defaults
+          await api.bulkSync(DEFAULT_ITEMS)
+          const seeded = await api.fetchItems()
+          if (!cancelled) setItems(seeded)
+        } else {
+          setItems(data)
+        }
+      } catch (err) {
+        console.error('Failed to load from database, falling back to localStorage:', err.message)
+        if (cancelled) return
+        setError(err.message)
+        // Fallback to localStorage
+        try {
+          const stored = localStorage.getItem(STORAGE_KEY)
+          if (stored) setItems(JSON.parse(stored))
+          else setItems(DEFAULT_ITEMS)
+        } catch {
+          setItems(DEFAULT_ITEMS)
+        }
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+    load()
+    return () => { cancelled = true }
+  }, [])
+
+  // Keep localStorage in sync as a backup
+  useEffect(() => {
+    if (items.length > 0) {
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)) } catch {}
+    }
   }, [items])
 
   const addItem = useCallback((name, sell) => {
     const newItem = { id: uid(), name, sell: parseFloat(sell) || 0, reagents: [] }
     setItems(prev => [...prev, newItem])
+    api.createItem(newItem).catch(err => console.error('Failed to save item:', err.message))
     return newItem.id
   }, [])
 
   const updateItem = useCallback((id, fields) => {
     setItems(prev => prev.map(it => it.id === id ? { ...it, ...fields } : it))
+    api.updateItem(id, fields).catch(err => console.error('Failed to update item:', err.message))
   }, [])
 
   const deleteItem = useCallback((id) => {
     setItems(prev => prev.filter(it => it.id !== id))
+    api.deleteItem(id).catch(err => console.error('Failed to delete item:', err.message))
   }, [])
 
   const duplicateItem = useCallback((id) => {
     setItems(prev => {
       const src = prev.find(it => it.id === id)
       if (!src) return prev
+      const newId = uid()
+      const reagentIds = src.reagents.map(() => uid())
       const copy = {
         ...src,
-        id: uid(),
+        id: newId,
         name: src.name + ' (copy)',
-        reagents: src.reagents.map(r => ({ ...r, id: uid() }))
+        reagents: src.reagents.map((r, i) => ({ ...r, id: reagentIds[i] }))
       }
       const idx = prev.findIndex(it => it.id === id)
       const next = [...prev]
       next.splice(idx + 1, 0, copy)
+
+      api.duplicateItem(id, newId, [...reagentIds])
+        .catch(err => console.error('Failed to duplicate item:', err.message))
+
       return next
     })
   }, [])
 
   const addReagent = useCallback((itemId) => {
+    const newReagent = { id: uid(), name: '', qty: 1, price: 0 }
     setItems(prev => prev.map(it =>
       it.id === itemId
-        ? { ...it, reagents: [...it.reagents, { id: uid(), name: '', qty: 1, price: 0 }] }
+        ? { ...it, reagents: [...it.reagents, newReagent] }
         : it
     ))
+    api.createReagent(itemId, newReagent)
+      .catch(err => console.error('Failed to add reagent:', err.message))
   }, [])
 
   const updateReagent = useCallback((itemId, reagentId, fields) => {
@@ -133,6 +180,8 @@ export function useStore() {
         ? { ...it, reagents: it.reagents.map(r => r.id === reagentId ? { ...r, ...fields } : r) }
         : it
     ))
+    api.updateReagent(itemId, reagentId, fields)
+      .catch(err => console.error('Failed to update reagent:', err.message))
   }, [])
 
   const deleteReagent = useCallback((itemId, reagentId) => {
@@ -141,14 +190,20 @@ export function useStore() {
         ? { ...it, reagents: it.reagents.filter(r => r.id !== reagentId) }
         : it
     ))
+    api.deleteReagent(itemId, reagentId)
+      .catch(err => console.error('Failed to delete reagent:', err.message))
   }, [])
 
   const resetToDefault = useCallback(() => {
     setItems(DEFAULT_ITEMS)
+    api.bulkSync(DEFAULT_ITEMS)
+      .catch(err => console.error('Failed to reset:', err.message))
   }, [])
 
   return {
     items,
+    loading,
+    error,
     addItem, updateItem, deleteItem, duplicateItem,
     addReagent, updateReagent, deleteReagent,
     resetToDefault,

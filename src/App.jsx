@@ -11,7 +11,7 @@ export default function App() {
   const [sortBy, setSortBy] = useState('default')
   const [filterDecision, setFilterDecision] = useState('all')
   const store = useStore()
-  const { items } = store
+  const { items, loading } = store
 
   // Compute sidebar stats
   const calcs = items.map(it => ({ item: it, ...calcItem(it) }))
@@ -51,10 +51,21 @@ export default function App() {
 
           {/* Tab content */}
           <div className="fade-up" key={activeTab}>
-            {activeTab === 'tracker'  && <ItemTracker store={store} sortBy={sortBy} filterDecision={filterDecision} />}
-            {activeTab === 'summary'  && <Summary items={items} />}
-            {activeTab === 'ah'       && <AHPrices items={items} />}
-            {activeTab === 'reagents' && <ExpensiveReagents items={items} />}
+            {loading ? (
+              <div style={{
+                textAlign: 'center', padding: '3rem 1rem',
+                color: 'var(--text-muted)', fontSize: '0.95rem',
+              }}>
+                Loading items from database...
+              </div>
+            ) : (
+              <>
+                {activeTab === 'tracker'  && <ItemTracker store={store} sortBy={sortBy} filterDecision={filterDecision} />}
+                {activeTab === 'summary'  && <Summary items={items} />}
+                {activeTab === 'ah'       && <AHPrices items={items} />}
+                {activeTab === 'reagents' && <ExpensiveReagents items={items} />}
+              </>
+            )}
           </div>
         </div>
 
@@ -190,7 +201,7 @@ export default function App() {
       {/* Footer */}
       <footer className="app-footer">
         <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-          WoW Crafting Tracker · Data saved in your browser · No account needed
+          WoW Crafting Tracker · Data synced to database · Local backup kept
         </span>
         {/* Keep footer buttons for non-xl screens where sidebar is hidden */}
         <div className="footer-actions" style={{ display: 'flex', gap: '0.75rem' }}>
