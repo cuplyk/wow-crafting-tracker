@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(taskkill //F //IM \"node.exe\")",
+      "Bash(node server/index.js)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(curl -s http://localhost:5173/api/items)",
+      "Bash(python -c \"import sys,json; data=json.load\\(sys.stdin\\); print\\(f'{len\\(data\\)} items, {sum\\(len\\(i[\\\\\"reagents\\\\\"]\\) for i in data\\)} reagents'\\); [print\\(f'  - {i[\\\\\"name\\\\\"]} \\({len\\(i[\\\\\"reagents\\\\\"]\\)} reagents\\)'\\) for i in data]\")"
+    ]
+  }
+}
