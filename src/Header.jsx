@@ -26,22 +26,15 @@ export default function Header({ activeTab, setActiveTab }) {
           display: 'flex', alignItems: 'center', gap: '1.5rem',
           height: 60,
         }}>
-          {/* Logo */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexShrink: 0 }}>
-            <span style={{ fontSize: '1.4rem' }}>⚔️</span>
-            <span style={{
-              fontFamily: 'Cinzel, serif',
-              fontSize: '1.1rem', fontWeight: 700,
-              color: 'var(--gold-bright)',
-              letterSpacing: '0.04em',
-              whiteSpace: 'nowrap',
-            }}>
-              Crafting Tracker
-            </span>
-          </div>
-
-          {/* Pill tabs */}
-          <nav style={{ display: 'flex', gap: '0.5rem', height: '100%', alignItems: 'center' }}>
+          {/* Centered pill tabs, minimal chrome */}
+          <nav style={{
+            display: 'flex',
+            gap: '0.5rem',
+            height: '100%',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flex: 1,
+          }}>
             {tabs.map(t => {
               const Icon = t.icon
               const isActive = activeTab === t.id
@@ -86,13 +79,6 @@ export default function Header({ activeTab, setActiveTab }) {
             })}
           </nav>
 
-          {/* Status tagline */}
-          <div className="hide-mobile" style={{
-            marginLeft: 'auto', fontSize: '0.75rem',
-            color: 'var(--text-muted)', fontStyle: 'italic',
-          }}>
-            Synced to database
-          </div>
         </div>
       </div>
     </header>

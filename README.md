@@ -30,6 +30,7 @@ npx gh-pages -d dist
 ```
 
 Add to `vite.config.js` if deploying to a subfolder:
+
 ```js
 export default defineConfig({
   base: '/your-repo-name/',
@@ -52,3 +53,4 @@ Open [http://localhost:5173](http://localhost:5173)
 - **lucide-react** for icons
 - Zero backend — localStorage for persistence
 - Deployable anywhere static files are served
+
