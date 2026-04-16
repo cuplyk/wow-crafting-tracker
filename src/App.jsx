@@ -4,6 +4,7 @@ import Header from './Header.jsx'
 import ItemTracker from './ItemTracker.jsx'
 import Summary from './Summary.jsx'
 import { AHPrices, ExpensiveReagents } from './AHPrices.jsx'
+import SalesRanking from './SalesRanking.jsx'
 import { Download, RotateCcw, ArrowUpDown, Filter, TrendingUp, TrendingDown, Minus } from 'lucide-react'
 
 export default function App() {
@@ -46,6 +47,7 @@ export default function App() {
               summary:  <PageTitle icon="📊" title="Profit Summary" sub="All items ranked by profit. Totals calculated automatically." />,
               ah:       <PageTitle icon="🏪" title="AH Price List" sub="All reagents aggregated across every item. Update prices in Item Tracker." />,
               reagents: <PageTitle icon="💰" title="Expensive Reagents" sub="Ranked by unit price — your biggest cost drivers." />,
+              sales:    <PageTitle icon="🏆" title="Sales Rankings" sub="Track sales performance, identify trends, and inform your crafting strategy." />,
             }[activeTab]}
           </div>
 
@@ -64,6 +66,7 @@ export default function App() {
                 {activeTab === 'summary'  && <Summary items={items} />}
                 {activeTab === 'ah'       && <AHPrices items={items} />}
                 {activeTab === 'reagents' && <ExpensiveReagents items={items} />}
+                {activeTab === 'sales'    && <SalesRanking items={items} />}
               </>
             )}
           </div>

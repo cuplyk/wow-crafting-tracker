@@ -5,7 +5,15 @@
       "Bash(node server/index.js)",
       "mcp__Claude_Preview__preview_start",
       "Bash(curl -s http://localhost:5173/api/items)",
-      "Bash(python -c \"import sys,json; data=json.load\\(sys.stdin\\); print\\(f'{len\\(data\\)} items, {sum\\(len\\(i[\\\\\"reagents\\\\\"]\\) for i in data\\)} reagents'\\); [print\\(f'  - {i[\\\\\"name\\\\\"]} \\({len\\(i[\\\\\"reagents\\\\\"]\\)} reagents\\)'\\) for i in data]\")"
+      "Bash(python -c \"import sys,json; data=json.load\\(sys.stdin\\); print\\(f'{len\\(data\\)} items, {sum\\(len\\(i[\\\\\"reagents\\\\\"]\\) for i in data\\)} reagents'\\); [print\\(f'  - {i[\\\\\"name\\\\\"]} \\({len\\(i[\\\\\"reagents\\\\\"]\\)} reagents\\)'\\) for i in data]\")",
+      "Bash(node server/migrate-sales.js)",
+      "Bash(curl -s http://localhost:5173/api/sales/analytics)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(json.dumps\\(d['summary'], indent=2\\)\\)\")",
+      "Bash(curl -s -X POST http://localhost:3001/api/sales -H \"Content-Type: application/json\" -d '{\"id\":\"s1\",\"itemId\":\"1\",\"qty\":5,\"unitPrice\":190,\"notes\":\"AH batch\"}')",
+      "Bash(curl -s -X POST http://localhost:3001/api/sales -H \"Content-Type: application/json\" -d '{\"id\":\"s2\",\"itemId\":\"1\",\"qty\":3,\"unitPrice\":185,\"notes\":\"Trade chat\"}')",
+      "Bash(curl -s -X POST http://localhost:3001/api/sales -H \"Content-Type: application/json\" -d '{\"id\":\"s3\",\"itemId\":\"2\",\"qty\":4,\"unitPrice\":97,\"notes\":\"AH\"}')",
+      "Bash(curl -s -X POST http://localhost:3001/api/sales -H \"Content-Type: application/json\" -d '{\"id\":\"s4\",\"itemId\":\"5\",\"qty\":7,\"unitPrice\":110,\"notes\":\"AH bulk\"}')",
+      "Bash(curl -s -X POST http://localhost:3001/api/sales -H \"Content-Type: application/json\" -d '{\"id\":\"s5\",\"itemId\":\"6\",\"qty\":10,\"unitPrice\":155,\"notes\":\"AH undercut\"}')"
     ]
   }
 }

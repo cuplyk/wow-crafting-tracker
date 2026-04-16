@@ -65,3 +65,28 @@ export async function bulkSync(items) {
     body: JSON.stringify({ items }),
   })
 }
+
+// ---------------------------------------------------------------------------
+// Sales
+// ---------------------------------------------------------------------------
+
+const SALES_BASE = '/api/sales'
+
+export async function fetchSales() {
+  return request(SALES_BASE)
+}
+
+export async function fetchSalesAnalytics() {
+  return request(`${SALES_BASE}/analytics`)
+}
+
+export async function createSale(sale) {
+  return request(SALES_BASE, {
+    method: 'POST',
+    body: JSON.stringify(sale),
+  })
+}
+
+export async function deleteSale(id) {
+  return request(`${SALES_BASE}/${id}`, { method: 'DELETE' })
+}

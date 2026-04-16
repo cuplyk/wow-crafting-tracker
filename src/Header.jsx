@@ -1,5 +1,5 @@
 import React from 'react'
-import { Hammer, BarChart3, Store, Coins } from 'lucide-react'
+import { Hammer, BarChart3, Store, Coins, Trophy } from 'lucide-react'
 
 export default function Header({ activeTab, setActiveTab }) {
   const tabs = [
@@ -7,6 +7,7 @@ export default function Header({ activeTab, setActiveTab }) {
     { id: 'summary',  label: 'Summary',      icon: BarChart3 },
     { id: 'ah',       label: 'AH Prices',    icon: Store },
     { id: 'reagents', label: 'Reagent Cost',  icon: Coins },
+    { id: 'sales',    label: 'Sales',         icon: Trophy },
   ]
 
   return (
@@ -90,7 +91,7 @@ export default function Header({ activeTab, setActiveTab }) {
             marginLeft: 'auto', fontSize: '0.75rem',
             color: 'var(--text-muted)', fontStyle: 'italic',
           }}>
-            Data saved in browser
+            Synced to database
           </div>
         </div>
       </div>

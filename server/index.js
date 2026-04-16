@@ -4,6 +4,7 @@ import cors from 'cors'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
 import itemsRouter from './routes/items.js'
+import salesRouter from './routes/sales.js'
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -46,6 +47,7 @@ app.use('/api', rateLimit({
 // ---------------------------------------------------------------------------
 
 app.use('/api/items', itemsRouter)
+app.use('/api/sales', salesRouter)
 
 // Health check
 app.get('/api/health', (_req, res) => {
