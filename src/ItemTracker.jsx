@@ -1,7 +1,25 @@
 import React, { useState, useRef } from 'react'
 import { calcItem, fmt, fmtPct } from './useStore.js'
+import { detectProfession, getProfession } from './professions.js'
 import { Trash2, Plus, ChevronDown, ChevronRight, Copy, Sword, FlaskConical, Hammer, Lightbulb, Database } from 'lucide-react'
 import HoverTooltip from './ItemTooltip.jsx'
+
+function ProfessionBadge({ item }) {
+  const profName = item.profession || detectProfession(item.name, item.reagents)
+  const prof = getProfession(profName)
+  if (!prof) return null
+  return (
+    <span style={{
+      fontSize: '0.68rem', fontWeight: 600,
+      padding: '0.15rem 0.55rem', borderRadius: 20,
+      color: prof.color, background: prof.bg,
+      border: `1px solid ${prof.border}`,
+      letterSpacing: '0.03em', whiteSpace: 'nowrap',
+    }}>
+      {prof.name}
+    </span>
+  )
+}
 
 function DecisionBadge({ decision }) {
   const map = {
@@ -143,7 +161,7 @@ function ItemCard({ item, onUpdate, onDelete, onDuplicate, onAddReagent, onUpdat
         onClick={() => setOpen(o => !o)}
         style={{
           display: 'grid',
-          gridTemplateColumns: 'auto 1fr auto auto auto auto',
+          gridTemplateColumns: 'auto 1fr auto auto auto auto auto',
           gap: '0.75rem', alignItems: 'center',
           padding: '0.8rem 1rem',
           background: 'var(--bg3)',
@@ -168,6 +186,8 @@ function ItemCard({ item, onUpdate, onDelete, onDuplicate, onAddReagent, onUpdat
             />
           </HoverTooltip>
         </div>
+
+        <ProfessionBadge item={item} />
 
         {/* Stats */}
         <span style={{ fontSize: '0.82rem', color: 'var(--text-dim)', whiteSpace: 'nowrap' }}>
@@ -302,7 +322,7 @@ function ItemCard({ item, onUpdate, onDelete, onDuplicate, onAddReagent, onUpdat
   )
 }
 
-export default function ItemTracker({ store, sortBy = 'default', filterDecision = 'all' }) {
+export default function ItemTracker({ store, sortBy = 'default', filterDecision = 'all', filterProfession = 'all' }) {
   const [showAdd, setShowAdd] = useState(false)
   const [newName, setNewName] = useState('')
   const [newSell, setNewSell] = useState('')
@@ -320,6 +340,13 @@ export default function ItemTracker({ store, sortBy = 'default', filterDecision 
 
     if (filterDecision !== 'all') {
       result = result.filter(i => calcItem(i).decision === filterDecision)
+    }
+
+    if (filterProfession !== 'all') {
+      result = result.filter(i => {
+        const p = i.profession || detectProfession(i.name, i.reagents)
+        return p === filterProfession
+      })
     }
 
     if (sortBy !== 'default') {

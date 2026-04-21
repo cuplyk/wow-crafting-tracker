@@ -6,11 +6,13 @@ import Summary from './Summary.jsx'
 import { AHPrices, ExpensiveReagents } from './AHPrices.jsx'
 import SalesRanking from './SalesRanking.jsx'
 import { Download, RotateCcw, ArrowUpDown, Filter, TrendingUp, TrendingDown, Minus } from 'lucide-react'
+import { detectProfession, getProfession } from './professions.js'
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('tracker')
   const [sortBy, setSortBy] = useState('default')
   const [filterDecision, setFilterDecision] = useState('all')
+  const [filterProfession, setFilterProfession] = useState('all')
   const store = useStore()
   const { items, loading } = store
 
@@ -23,6 +25,16 @@ export default function App() {
   const craftCount = calcs.filter(c => c.decision === 'craft').length
   const marginalCount = calcs.filter(c => c.decision === 'marginal').length
   const skipCount = calcs.filter(c => c.decision === 'skip').length
+
+  // Profession breakdown — count items per detected profession
+  const professionMap = {}
+  items.forEach(item => {
+    const p = item.profession || detectProfession(item.name, item.reagents)
+    professionMap[p] = (professionMap[p] || 0) + 1
+  })
+  const activeProfs = Object.entries(professionMap)
+    .filter(([name]) => name !== 'Unknown')
+    .sort((a, b) => b[1] - a[1])
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -62,7 +74,7 @@ export default function App() {
               </div>
             ) : (
               <>
-                {activeTab === 'tracker'  && <ItemTracker store={store} sortBy={sortBy} filterDecision={filterDecision} />}
+                {activeTab === 'tracker'  && <ItemTracker store={store} sortBy={sortBy} filterDecision={filterDecision} filterProfession={filterProfession} />}
                 {activeTab === 'summary'  && <Summary items={items} />}
                 {activeTab === 'ah'       && <AHPrices items={items} />}
                 {activeTab === 'reagents' && <ExpensiveReagents items={items} />}
@@ -165,6 +177,57 @@ export default function App() {
                     {f.label}
                   </button>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* Profession filter (tracker tab only, shown when multiple professions detected) */}
+          {activeTab === 'tracker' && activeProfs.length > 0 && (
+            <div className="sidebar-card">
+              <div className="sidebar-label">
+                <Filter size={11} style={{ display: 'inline', verticalAlign: '-1px', marginRight: 4 }} />
+                Profession
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+                <button
+                  onClick={() => setFilterProfession('all')}
+                  style={{
+                    background: filterProfession === 'all' ? 'rgba(255,255,255,0.05)' : 'transparent',
+                    border: `1px solid ${filterProfession === 'all' ? 'rgba(255,255,255,0.15)' : 'transparent'}`,
+                    color: filterProfession === 'all' ? 'var(--text)' : 'var(--text-dim)',
+                    padding: '0.35rem 0.6rem',
+                    borderRadius: 6, fontSize: '0.78rem', fontWeight: 500,
+                    textAlign: 'left', transition: 'all 0.15s',
+                  }}
+                >
+                  All professions
+                </button>
+                {activeProfs.map(([name, count]) => {
+                  const prof = getProfession(name)
+                  const isActive = filterProfession === name
+                  return (
+                    <button
+                      key={name}
+                      onClick={() => setFilterProfession(name)}
+                      style={{
+                        background: isActive ? prof?.bg ?? 'rgba(255,255,255,0.05)' : 'transparent',
+                        border: `1px solid ${isActive ? prof?.border ?? 'rgba(255,255,255,0.15)' : 'transparent'}`,
+                        color: isActive ? prof?.color ?? 'var(--text)' : 'var(--text-dim)',
+                        padding: '0.35rem 0.6rem',
+                        borderRadius: 6, fontSize: '0.78rem', fontWeight: 500,
+                        textAlign: 'left', transition: 'all 0.15s',
+                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                      }}
+                    >
+                      <span>{name}</span>
+                      <span style={{
+                        fontSize: '0.68rem', color: 'var(--text-muted)',
+                        background: 'rgba(255,255,255,0.06)',
+                        padding: '0.05rem 0.4rem', borderRadius: 10,
+                      }}>{count}</span>
+                    </button>
+                  )
+                })}
               </div>
             </div>
           )}
