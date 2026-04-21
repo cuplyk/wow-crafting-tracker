@@ -302,7 +302,7 @@ function ItemCard({ item, onUpdate, onDelete, onDuplicate, onAddReagent, onUpdat
   )
 }
 
-export default function ItemTracker({ store }) {
+export default function ItemTracker({ store, sortBy = 'default', filterDecision = 'all' }) {
   const [showAdd, setShowAdd] = useState(false)
   const [newName, setNewName] = useState('')
   const [newSell, setNewSell] = useState('')
@@ -313,9 +313,31 @@ export default function ItemTracker({ store }) {
     addReagent, updateReagent, deleteReagent
   } = store
 
-  const filtered = search
-    ? items.filter(i => i.name.toLowerCase().includes(search.toLowerCase()))
-    : items
+  const filtered = (() => {
+    let result = search
+      ? items.filter(i => i.name.toLowerCase().includes(search.toLowerCase()))
+      : [...items]
+
+    if (filterDecision !== 'all') {
+      result = result.filter(i => calcItem(i).decision === filterDecision)
+    }
+
+    if (sortBy !== 'default') {
+      result = [...result].sort((a, b) => {
+        const ca = calcItem(a)
+        const cb = calcItem(b)
+        switch (sortBy) {
+          case 'profit-desc': return cb.profit - ca.profit
+          case 'profit-asc':  return ca.profit - cb.profit
+          case 'margin-desc': return cb.margin - ca.margin
+          case 'cost-desc':   return cb.matCost - ca.matCost
+          default: return 0
+        }
+      })
+    }
+
+    return result
+  })()
 
   const handleAdd = () => {
     if (!newName.trim()) return
