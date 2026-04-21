@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { TrendingUp, TrendingDown, Minus, ShoppingCart, Trash2, ChevronDown, ChevronRight, Award, Target, AlertTriangle, Zap } from 'lucide-react'
-import { fmt, fmtPct, calcItem } from './useStore.js'
+import { fmt, fmtPct, calcItem, uid } from './useStore.js'
 import * as api from './api.js'
-
-function uid() { return Math.random().toString(36).slice(2, 10) }
 
 // ---------------------------------------------------------------------------
 // Mini sparkline (pure CSS bars)
