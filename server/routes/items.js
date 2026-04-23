@@ -317,16 +317,62 @@ router.put('/:itemId/reagents/:reagentId', async (req, res) => {
   sets.push(`updated_at = NOW()`)
   values.push(itemId, reagentId)
 
+  const client = await pool.connect()
   try {
-    const { rowCount } = await pool.query(
+    await client.query('BEGIN')
+
+    // If price is changing, fetch current state for history record
+    if (fields.price !== undefined) {
+      const { rows } = await client.query(
+        `SELECT r.price AS old_price, r.name AS reagent_name, i.name AS item_name
+         FROM reagents r
+         JOIN items i ON i.id = r.item_id
+         WHERE r.item_id = $1 AND r.id = $2`,
+        [itemId, reagentId]
+      )
+      if (rows.length === 0) {
+        await client.query('ROLLBACK')
+        return res.status(404).json({ error: 'Reagent not found' })
+      }
+      const { old_price, reagent_name, item_name } = rows[0]
+      const newPrice = parseFloat(fields.price)
+      const oldPrice = parseFloat(old_price)
+
+      if (newPrice !== oldPrice) {
+        await client.query(
+          `INSERT INTO reagent_price_history
+             (id, reagent_id, reagent_name, item_id, item_name, old_price, new_price)
+           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+          [
+            crypto.randomUUID(),
+            reagentId,
+            reagent_name,
+            itemId,
+            item_name,
+            oldPrice,
+            newPrice,
+          ]
+        )
+      }
+    }
+
+    const { rowCount } = await client.query(
       `UPDATE reagents SET ${sets.join(', ')} WHERE item_id = $${idx} AND id = $${idx + 1}`,
       values
     )
-    if (rowCount === 0) return res.status(404).json({ error: 'Reagent not found' })
+    if (rowCount === 0) {
+      await client.query('ROLLBACK')
+      return res.status(404).json({ error: 'Reagent not found' })
+    }
+
+    await client.query('COMMIT')
     res.json({ success: true })
   } catch (err) {
+    await client.query('ROLLBACK')
     console.error('PUT reagent error:', err.message)
     res.status(500).json({ error: 'Failed to update reagent' })
+  } finally {
+    client.release()
   }
 })
 

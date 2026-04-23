@@ -1,13 +1,14 @@
 import React from 'react'
-import { Hammer, BarChart3, Store, Coins, Trophy } from 'lucide-react'
+import { Hammer, BarChart3, Store, Coins, Trophy, Clock } from 'lucide-react'
 
 export default function Header({ activeTab, setActiveTab }) {
   const tabs = [
-    { id: 'tracker',  label: 'Tracker',      icon: Hammer },
-    { id: 'summary',  label: 'Summary',      icon: BarChart3 },
-    { id: 'ah',       label: 'AH Prices',    icon: Store },
-    { id: 'reagents', label: 'Reagent Cost',  icon: Coins },
-    { id: 'sales',    label: 'Sales',         icon: Trophy },
+    { id: 'tracker',  label: 'Tracker',       icon: Hammer },
+    { id: 'summary',  label: 'Summary',       icon: BarChart3 },
+    { id: 'ah',       label: 'AH Prices',     icon: Store },
+    { id: 'reagents', label: 'Reagent Cost',   icon: Coins },
+    { id: 'sales',    label: 'Sales',          icon: Trophy },
+    { id: 'history',  label: 'Price History',  icon: Clock },
   ]
 
   return (

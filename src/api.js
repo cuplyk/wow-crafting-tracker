@@ -90,3 +90,24 @@ export async function createSale(sale) {
 export async function deleteSale(id) {
   return request(`${SALES_BASE}/${id}`, { method: 'DELETE' })
 }
+
+// ---------------------------------------------------------------------------
+// Price History
+// ---------------------------------------------------------------------------
+
+const PH_BASE = '/api/price-history'
+
+export async function fetchPriceHistory({ reagentName, itemId, from, to, limit } = {}) {
+  const params = new URLSearchParams()
+  if (reagentName) params.set('reagentName', reagentName)
+  if (itemId)      params.set('itemId', itemId)
+  if (from)        params.set('from', from)
+  if (to)          params.set('to', to)
+  if (limit)       params.set('limit', limit)
+  const qs = params.toString()
+  return request(`${PH_BASE}${qs ? `?${qs}` : ''}`)
+}
+
+export async function fetchPriceHistorySummary() {
+  return request(`${PH_BASE}/summary`)
+}

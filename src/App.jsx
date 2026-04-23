@@ -5,6 +5,7 @@ import ItemTracker from './ItemTracker.jsx'
 import Summary from './Summary.jsx'
 import { AHPrices, ExpensiveReagents } from './AHPrices.jsx'
 import SalesRanking from './SalesRanking.jsx'
+import PriceHistory from './PriceHistory.jsx'
 import { Download, RotateCcw, ArrowUpDown, Filter, TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import { detectProfession, getProfession } from './professions.js'
 
@@ -60,6 +61,7 @@ export default function App() {
               ah:       <PageTitle icon="🏪" title="AH Price List" sub="All reagents aggregated across every item. Update prices in Item Tracker." />,
               reagents: <PageTitle icon="💰" title="Expensive Reagents" sub="Ranked by unit price — your biggest cost drivers." />,
               sales:    <PageTitle icon="🏆" title="Sales Rankings" sub="Track sales performance, identify trends, and inform your crafting strategy." />,
+              history:  <PageTitle icon="📈" title="Price History" sub="Track how reagent prices change over time. Every AH price update is recorded automatically." />,
             }[activeTab]}
           </div>
 
@@ -79,6 +81,7 @@ export default function App() {
                 {activeTab === 'ah'       && <AHPrices items={items} />}
                 {activeTab === 'reagents' && <ExpensiveReagents items={items} />}
                 {activeTab === 'sales'    && <SalesRanking items={items} />}
+                {activeTab === 'history'  && <PriceHistory />}
               </>
             )}
           </div>
